@@ -1,0 +1,27 @@
+#server:
+#  port: 8080
+
+# Eureka properties
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka
+
+#spring:
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: inventory-service
+#          uri: lb://inventory-service # Service name registered in Eureka
+#          predicates:
+#            - Path=/api/inventories/** # Route requests matching this path to the service
+#
+#        - id: order-service
+#          uri: lb://order-service
+#          predicates:
+#            - Path=/api/orders/**
+#
+#        - id: product-service
+#          uri: lb://product-service
+#          predicates:
+#            - Path=/api/products/**
