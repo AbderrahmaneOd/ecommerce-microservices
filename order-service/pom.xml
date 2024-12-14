@@ -129,6 +129,17 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <!-- plugin for building container images -->
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.4.4</version>
+				<configuration>
+					<to>
+						<image>abdeod/config-server:latest</image>
+					</to>
+				</configuration>
+			</plugin>            
         </plugins>
     </build>
 
