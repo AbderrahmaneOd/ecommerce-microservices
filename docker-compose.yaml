@@ -10,6 +10,28 @@ services:
     volumes:
       - ./mongo-data:/data/db
 
+  postgres_orders:
+    image: postgres:14-alpine
+    ports:
+      - 5431:5432
+#    volumes:
+#      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=order-service
+      - POSTGRES_USER=order-service
+      - POSTGRES_DB=OrdersDB
+
+  postgres_inventories:
+    image: postgres:14-alpine
+    ports:
+      - 5432:5432
+#    volumes:
+#      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=inventory-service
+      - POSTGRES_USER=inventory-service
+      - POSTGRES_DB=InventoryDB
+
   # Config Server (Sprint Cloud Config Server)
   config-server:
     image: abdeod/config-server:latest
@@ -41,8 +63,6 @@ services:
     container_name: api-gateway
     ports:
       - "8080:8080"
-    expose:
-      - "8181"
     environment:
 #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8080/eureka
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8080/
@@ -51,18 +71,46 @@ services:
       - config-server
       - discovery-server
 
-  # Product Service Config
+  # Product Service
   product-service:
     image: abdeod/product-service:latest
     container_name: product-service
     ports:
       - "8081:8080"
     environment:
-      - EUREKA_SERVICE_URL_DEFAULT_ZONE=http://discovery-server:8080/eureka/#
+#      - EUREKA_SERVICE_URL_DEFAULT_ZONE=http://discovery-server:8080/eureka/#
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8080/
       - SPRING_PROFILES_ACTIVE=docker
 #      - SPRING_CLOUD_CONFIG_ENABLED=false
     depends_on:
       - mongo
+      - discovery-server
+      - config-server
+
+  # Order Service
+  order-service:
+    image: abdeod/order-service:latest
+    container_name: order-service
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8080/
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres_orders
+      - discovery-server
+      - config-server
+
+  # Inventory Service
+  inventory-service:
+    image: abdeod/inventory-service:latest
+    container_name: inventory-service
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8080/
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres_inventories
       - discovery-server
       - config-server
