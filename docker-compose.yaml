@@ -1,0 +1,68 @@
+services:
+
+  # MongoDB Config for product service
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-data:/data/db
+
+  # Config Server (Sprint Cloud Config Server)
+  config-server:
+    image: abdeod/config-server:latest
+    container_name: config-server
+    ports:
+      - "8888:8080"
+    environment:
+      - SERVER_PORT=8080
+#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8080/eureka
+#    depends_on:
+#      - discovery-server
+
+
+  # Discovery Server (Eureka Server) Config
+  discovery-server:
+    image: abdeod/discovery-server:latest
+    container_name: discovery-server
+    ports:
+      - "8761:8080"
+#    environment:
+#      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8080/
+    depends_on:
+      - config-server
+
+
+  # API Gateway Service Config
+  api-gateway:
+    image: abdeod/api-gateway:latest
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    expose:
+      - "8181"
+    environment:
+#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8080/eureka
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8080/
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - config-server
+      - discovery-server
+
+  # Product Service Config
+  product-service:
+    image: abdeod/product-service:latest
+    container_name: product-service
+    ports:
+      - "8081:8080"
+    environment:
+      - EUREKA_SERVICE_URL_DEFAULT_ZONE=http://discovery-server:8080/eureka/#
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8080/
+      - SPRING_PROFILES_ACTIVE=docker
+#      - SPRING_CLOUD_CONFIG_ENABLED=false
+    depends_on:
+      - mongo
+      - discovery-server
+      - config-server
