@@ -1,5 +1,6 @@
 package com.simpleproject.orderservice.service;
 
+import com.simpleproject.orderservice.config.KafkaOrderProducer;
 import com.simpleproject.orderservice.dto.CreateOrderRequest;
 import com.simpleproject.orderservice.dto.OrderItemDto;
 import com.simpleproject.orderservice.dto.OrderItemResponse;
@@ -30,6 +31,8 @@ public class OrderService {
 
     private final UserServiceClient userService;
 
+    private final KafkaOrderProducer kafkaOrderProducer;
+
     // Create a new order
     public void placeOrder(CreateOrderRequest orderRequest) {
 
@@ -40,12 +43,12 @@ public class OrderService {
         }
 
         // Check inventory
-//        for (OrderItemDto orderItem : orderRequest.getOrderItems()) {
-//            boolean inStock = inventoryService.checkInventory(orderItem.getSkuCode(), orderItem.getQuantity());
-//            if (!inStock) {
-//                throw new IllegalStateException("Product " + orderItem.getSkuCode() + " is not in stock");
-//            }
-//        }
+        for (OrderItemDto orderItem : orderRequest.getOrderItems()) {
+            boolean inStock = inventoryService.checkInventory(orderItem.getSkuCode(), orderItem.getQuantity());
+            if (!inStock) {
+                throw new IllegalStateException("Product " + orderItem.getSkuCode() + " is not in stock");
+            }
+        }
 
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
@@ -61,6 +64,15 @@ public class OrderService {
         // Save the Order
         orderRepository.save(order);
         log.info("Order {} is saved successfully", order.getId());
+
+        // Prepare OrderResponse
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setOrderNumber(order.getOrderNumber());
+        orderResponse.setUserEmail(email);
+        orderResponse.setItems(orderRequest.getOrderItems());
+
+        // Send notification to Kafka
+        kafkaOrderProducer.sendOrder(orderResponse);
     }
 
     // Get all orders
@@ -119,7 +131,7 @@ public class OrderService {
                 .orderNumber(order.getOrderNumber())
                 .items(order.getItems()
                         .stream()
-                        .map(item -> OrderItemResponse.builder()
+                        .map(item -> OrderItemDto.builder()
                                 .skuCode(item.getSkuCode())
                                 .unitPrice(item.getUnitPrice())
                                 .quantity(item.getQuantity())

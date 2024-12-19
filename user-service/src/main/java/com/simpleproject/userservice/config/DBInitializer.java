@@ -22,6 +22,7 @@ public class DBInitializer {
         return args -> {
             // Array of users to be inserted
             User[] users = {
+                    new User(null, "abderrahmane.ouaday@gmail.com", "abderrahmane", "password123"),
                     new User(null, "alice@example.com", "alice123", "password123"),
                     new User(null, "bob@example.com", "bob456", "password456"),
                     new User(null, "charlie@example.com", "charlie789", "password789"),

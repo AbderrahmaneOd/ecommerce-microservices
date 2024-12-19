@@ -13,5 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class OrderResponse implements Serializable {
-    private List<OrderItemResponse> orderItems;
+    private String orderNumber;
+    private String userEmail;
+    private List<OrderItemResponse> items;
 }

@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateOrderRequest implements Serializable {
+public class CreateOrderRequest {
     private String userId;
     private List<OrderItemDto> orderItems;
 }

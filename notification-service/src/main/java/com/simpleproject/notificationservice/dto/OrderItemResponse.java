@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderItemResponse implements Serializable {
-    private String skuCode; // Stock Keeping Unit code, unique product identifier
+    private String skuCode;
     private BigDecimal unitPrice;
     private Integer quantity;
 }
