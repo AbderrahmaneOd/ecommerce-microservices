@@ -1,14 +1,24 @@
 services:
 
-  # MongoDB Config for product service
-  mongo:
+  # MongoDB for product service
+  mongo_products:
     container_name: mongo
     image: mongo:latest
     restart: unless-stopped
     ports:
       - "27017:27017"
-    volumes:
-      - ./mongo-data:/data/db
+    # volumes:
+    #   - ./mongo-data:/data/db
+
+  # MongoDB for user service
+  mongo_users:
+    container_name: mongo
+    image: mongo:latest
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    # volumes:
+    #   - ./mongo-data:/data/db
 
   postgres_orders:
     image: postgres:14-alpine
@@ -83,7 +93,7 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
 #      - SPRING_CLOUD_CONFIG_ENABLED=false
     depends_on:
-      - mongo
+      - mongo_products
       - discovery-server
       - config-server
 
@@ -114,3 +124,44 @@ services:
       - postgres_inventories
       - discovery-server
       - config-server
+
+      
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    # volumes:
+    #   - kafka_zookeeper:/opt/zookeeper-3.6.1/data
+    
+  kafka:
+    image: 'bitnami/kafka:latest'
+    container_name: kafka
+    ports:
+      - "9093:9093"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://0.0.0.0:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://98.66.178.136:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+    # volumes:
+    #   - kafka_kafka:/opt/kafka_2.12-2.2.0/logs
+    depends_on:
+      - "zookeeper"
+  
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka

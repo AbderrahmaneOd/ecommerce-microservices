@@ -1,11 +1,14 @@
 package com.simpleproject.orderservice.controller;
 
 
+import com.simpleproject.orderservice.config.KafkaOrderProducer;
+import com.simpleproject.orderservice.config.KafkaProducer;
 import com.simpleproject.orderservice.dto.CreateOrderRequest;
 import com.simpleproject.orderservice.dto.OrderResponse;
 import com.simpleproject.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +19,8 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final KafkaProducer kafkaProducer; // Just for testing
+    private final KafkaOrderProducer kafkaOrderProducer;
 
     // Create Product
      @PostMapping
@@ -50,4 +55,15 @@ public class OrderController {
         orderService.deleteOrder(id);
     }
 
+    // Just for testing Kafka
+    @PostMapping("/send")
+    public void sendMessageToKafka(@RequestBody String message) {
+        kafkaProducer.sendMessage(message);
+    }
+
+    @PostMapping("/send-order")
+    public ResponseEntity<String> sendOrderToKafka(@RequestBody OrderResponse orderResponse) {
+        kafkaOrderProducer.sendOrder(orderResponse);
+        return ResponseEntity.ok("Order submitted to Kafka successfully");
+    }
 }

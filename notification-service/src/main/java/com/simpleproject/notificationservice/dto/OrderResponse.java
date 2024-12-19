@@ -1,4 +1,4 @@
-package com.simpleproject.orderservice.dto;
+package com.simpleproject.notificationservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateOrderRequest implements Serializable {
-    private String userId;
-    private List<OrderItemDto> orderItems;
+public class OrderResponse implements Serializable {
+    private List<OrderItemResponse> orderItems;
 }

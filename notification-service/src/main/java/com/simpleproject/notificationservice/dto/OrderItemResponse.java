@@ -1,5 +1,4 @@
-package com.simpleproject.orderservice.dto;
-
+package com.simpleproject.notificationservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,8 +10,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderItemDto implements Serializable {
-    //private Long id;
+public class OrderItemResponse implements Serializable {
     private String skuCode; // Stock Keeping Unit code, unique product identifier
     private BigDecimal unitPrice;
     private Integer quantity;

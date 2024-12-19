@@ -26,19 +26,26 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    private final InventoryServiceClient inventoryServiceClient;
+    private final InventoryServiceClient inventoryService;
+
+    private final UserServiceClient userService;
 
     // Create a new order
     public void placeOrder(CreateOrderRequest orderRequest) {
 
+        // Check user
+        String email = userService.checkUserExistence(orderRequest.getUserId());
+        if (email == null || email.isEmpty()){
+            throw new IllegalStateException("User " + orderRequest.getUserId() + " is not found");
+        }
 
         // Check inventory
-        for (OrderItemDto orderItem : orderRequest.getOrderItems()) {
-            boolean inStock = inventoryServiceClient.checkInventory(orderItem.getSkuCode(), orderItem.getQuantity());
-            if (!inStock) {
-                throw new IllegalStateException("Product " + orderItem.getSkuCode() + " is not in stock");
-            }
-        }
+//        for (OrderItemDto orderItem : orderRequest.getOrderItems()) {
+//            boolean inStock = inventoryService.checkInventory(orderItem.getSkuCode(), orderItem.getQuantity());
+//            if (!inStock) {
+//                throw new IllegalStateException("Product " + orderItem.getSkuCode() + " is not in stock");
+//            }
+//        }
 
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
