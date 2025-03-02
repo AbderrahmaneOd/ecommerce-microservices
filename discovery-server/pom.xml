@@ -71,7 +71,7 @@
 				<version>3.4.4</version>
 				<configuration>
 					<to>
-						<image>abdeod/config-server:latest</image>
+						<image>abdeod/discovery-server:latest</image>
 					</to>
 				</configuration>
 			</plugin>
