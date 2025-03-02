@@ -25,7 +25,6 @@ public class InventoryService {
         Optional<Inventory> inventoryOptional = inventoryRepository.findBySkuCode(skuCode);
 
         if (inventoryOptional.isEmpty()) {
-            // SKU does not exist, return response indicating it is not in stock
 //            return InventoryResponse.builder()
 //                    .skuCode(skuCode)
 //                    .isInStock(false)

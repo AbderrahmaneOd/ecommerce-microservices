@@ -103,7 +103,7 @@
                 <version>3.4.4</version>
                 <configuration>
                     <to>
-                        <image>abdeod/order-service:latest</image>
+                        <image>abdeod/notification-service:latest</image>
                     </to>
                 </configuration>
             </plugin>
