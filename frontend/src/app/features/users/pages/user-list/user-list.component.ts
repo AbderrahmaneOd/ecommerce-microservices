@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
@@ -9,10 +9,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, of, catchError, EMPTY, BehaviorSubject } from 'rxjs';
 import { User } from '../../../../core/models/user.model';
 import { UserService } from '../../services/user.service';
-import { map } from 'rxjs/operators';
+import { map, finalize } from 'rxjs/operators';
 
 export interface PagedResponse<T> {
   content: T[];
@@ -36,60 +36,97 @@ export interface PagedResponse<T> {
   ],
   templateUrl: './user-list.component.html',
 })
-export class UserListComponent {
+export class UserListComponent implements OnInit {
   displayedColumns: string[] = ['username', 'email', 'status', 'action'];
-  users$!: Observable<User[]>;
-
+  
+  // Change to BehaviorSubject for better error handling
+  private usersSubject = new BehaviorSubject<User[]>([]);
+  users$ = this.usersSubject.asObservable();
+  
   // Pagination properties
   totalUsers = 0;
   pageSize = 5;
   currentPage = 0;
+  
+  // Error handling
+  hasError = false;
+  errorMessage = 'Unable to connect to the server. Please try again later.';
+  loading = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private userService: UserService,
     private router: Router
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.loadUsers()
+    this.loadUsers();
   }
 
   loadUsers(): void {
+    // Reset error state
+    this.hasError = false;
+    this.loading = true;
+    
     // Fetch users using pagination parameters
-    this.users$ = this.userService.getUsers(this.currentPage, this.pageSize).pipe(
-      map((response: PagedResponse<User>) => {
-        this.totalUsers = response.totalElements; // Set the total number of users for pagination
-        return response.content;  // Return only the list of users
-      })
-    );
+    this.userService.getUsers(this.currentPage, this.pageSize)
+      .pipe(
+        map((response: PagedResponse<User>) => {
+          this.totalUsers = response.totalElements;
+          return response.content;
+        }),
+        catchError(error => {
+          console.error('Error fetching users:', error);
+          this.hasError = true;
+          return of([]);  // Return empty array on error
+        }),
+        finalize(() => {
+          this.loading = false;
+        })
+      )
+      .subscribe({
+        next: (users) => {
+          this.usersSubject.next(users);
+        },
+        error: (err) => {
+          // This shouldn't be reached due to catchError above, but as a safety
+          console.error('Uncaught error in subscription:', err);
+          this.hasError = true;
+          this.usersSubject.next([]);
+        }
+      });
   }
-
 
   // Called when pagination changes
   onPageChange(event: PageEvent): void {
-    this.currentPage = event.pageIndex;  // Update the current page based on the event
-    this.pageSize = event.pageSize;  // Update page size if changed
-    this.loadUsers();  // Reload users with the new page settings
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadUsers();
   }
-
 
   viewUser(id: string): void {
     this.router.navigate(['/users', id]);
   }
 
-  addUser(): void {
-    this.router.navigate(['/users/new']);
-  }
-
   deleteUser(id: string): void {
     if (confirm('Are you sure you want to delete this user?')) {
-      this.userService.deleteUser(id).subscribe(() => {
-        this.loadUsers();
-      });
+      this.userService.deleteUser(id)
+        .pipe(
+          catchError(error => {
+            console.error('Error deleting user:', error);
+            this.hasError = true;
+            alert('Failed to delete user. Please try again later.');
+            return EMPTY;
+          })
+        )
+        .subscribe(() => {
+          this.loadUsers();
+        });
     }
   }
 
+  retryConnection(): void {
+    this.loadUsers();
+  }
 }
