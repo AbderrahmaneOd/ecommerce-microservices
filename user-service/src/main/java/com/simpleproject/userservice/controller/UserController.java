@@ -6,6 +6,10 @@ import com.simpleproject.userservice.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +17,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin("*")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     // Create a new user
     @PostMapping
@@ -36,10 +43,33 @@ public class UserController {
     }
 
     // Get all users
+    //@GetMapping
+    //public ResponseEntity<List<UserDTO>> getAllUsers() {
+    //    List<UserDTO> users = userService.getAllUsers();
+    //    return ResponseEntity.ok(users);
+    //}
+
+    // Get paginated users
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
+    public ResponseEntity<Page<UserDTO>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserDTO> users = userService.getAllUsers(pageable);
+
         return ResponseEntity.ok(users);
+    }
+
+    // Count user
+    @GetMapping("/count")
+    public ResponseEntity<Long> getUserCount() {
+        try {
+            long count = userService.getUserCount();
+            return ResponseEntity.ok(count);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // Check if user exists by ID and return their email

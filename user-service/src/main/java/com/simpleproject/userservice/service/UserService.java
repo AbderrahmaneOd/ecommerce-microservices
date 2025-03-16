@@ -3,18 +3,18 @@ package com.simpleproject.userservice.service;
 import com.simpleproject.userservice.dto.UserDTO;
 import com.simpleproject.userservice.model.User;
 import com.simpleproject.userservice.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     // Create a new user
     public User createUser(User user) {
@@ -29,10 +29,14 @@ public class UserService {
     }
 
     // Get all users and return as a list of UserDTOs
-    public List<UserDTO> getAllUsers() {
+    /*public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(user -> new UserDTO(user.getId(), user.getEmail(), user.getUsername()))
                 .collect(Collectors.toList());
+    }*/
+
+    public Page<UserDTO> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable).map(user -> new UserDTO(user.getId(), user.getEmail(), user.getUsername()));
     }
 
     // Get user email by ID (for checking if the user exists)
@@ -58,5 +62,9 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    public long getUserCount() {
+        return userRepository.count();
     }
 }
