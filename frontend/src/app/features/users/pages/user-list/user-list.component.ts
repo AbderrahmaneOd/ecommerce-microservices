@@ -1,26 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MaterialModule } from 'src/app/material.module';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
+import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { User } from '../../../../core/models/user.model';
 import { UserService } from '../../services/user.service';
+import { map } from 'rxjs/operators';
 
+export interface PagedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  pageNumber: number;
+  pageSize: number;
+}
 
-const USER_DATA: User[] = [
-  {
-    id: 1,
-    username: 'John Doe',
-    email: 'john.doe@gmail.com',
-    active: true,
-  },
-
-];
 @Component({
   selector: 'app-user-list',
   imports: [
@@ -31,17 +32,25 @@ const USER_DATA: User[] = [
     MatIconModule,
     MatMenuModule,
     MatButtonModule,
+    RouterModule,
   ],
   templateUrl: './user-list.component.html',
 })
 export class UserListComponent {
-  displayedColumns1: string[] = ['username', 'email', 'priority', 'action'];
-  // dataSource1 = USER_DATA;
+  displayedColumns: string[] = ['username', 'email', 'status', 'action'];
   users$!: Observable<User[]>;
+
+  // Pagination properties
+  totalUsers = 0;
+  pageSize = 5;
+  currentPage = 0;
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private userService: UserService,
-    private router: Router) {
+    private router: Router
+  ) {
   }
 
   ngOnInit(): void {
@@ -49,10 +58,25 @@ export class UserListComponent {
   }
 
   loadUsers(): void {
-    this.users$ = this.userService.getUsers();
+    // Fetch users using pagination parameters
+    this.users$ = this.userService.getUsers(this.currentPage, this.pageSize).pipe(
+      map((response: PagedResponse<User>) => {
+        this.totalUsers = response.totalElements; // Set the total number of users for pagination
+        return response.content;  // Return only the list of users
+      })
+    );
   }
 
-  viewUser(id: number): void {
+
+  // Called when pagination changes
+  onPageChange(event: PageEvent): void {
+    this.currentPage = event.pageIndex;  // Update the current page based on the event
+    this.pageSize = event.pageSize;  // Update page size if changed
+    this.loadUsers();  // Reload users with the new page settings
+  }
+
+
+  viewUser(id: string): void {
     this.router.navigate(['/users', id]);
   }
 
@@ -60,7 +84,7 @@ export class UserListComponent {
     this.router.navigate(['/users/new']);
   }
 
-  deleteUser(id: number): void {
+  deleteUser(id: string): void {
     if (confirm('Are you sure you want to delete this user?')) {
       this.userService.deleteUser(id).subscribe(() => {
         this.loadUsers();

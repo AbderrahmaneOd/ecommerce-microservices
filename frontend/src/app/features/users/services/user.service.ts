@@ -1,73 +1,57 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { User } from '../../../core/models/user.model';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { User, CreateUserRequest, UpdateUserRequest } from '../../../core/models/user.model';
+
+
+export interface PagedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  pageNumber: number;
+  pageSize: number;
+}
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private users: User[] = [
-    {
-      id: 1,
-      username: 'John Doe',
-      email: 'john@example.com',
-      active: true
-    },
-    {
-      id: 2,
-      username: 'Jane Smith',
-      email: 'jane@example.com',
-      active: true
-    },
-    {
-      id: 3,
-      username: 'Bob Johnson',
-      email: 'bob@example.com',
-      active: false
-    }
-  ];
+  private apiUrl = 'http://localhost:8085/api/users';
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
-  // Simulate API call to get all users
-  getUsers(): Observable<User[]> {
-    return of(this.users).pipe(delay(500)); // Simulate network delay
+  // Get all users with pagination
+  getUsers(pageNumber: number = 0, pageSize: number = 5): Observable<PagedResponse<User>> {
+    const params = new HttpParams()
+      .set('page', pageNumber.toString())
+      .set('size', pageSize.toString());
+
+    return this.http.get<PagedResponse<User>>(this.apiUrl, { params });
+  }
+
+  // Get the total count of users
+  getUserCount(): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/count`);
   }
 
   // Get user by ID
-  getUserById(id: number): Observable<User | undefined> {
-    const user = this.users.find(u => u.id === id);
-    return of(user).pipe(delay(500));
+  getUserById(id: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
 
   // Add new user
-  addUser(user: Omit<User, 'id' | 'createdAt'>): Observable<User> {
-    const newUser: User = {
-      ...user,
-      id: this.getNextId(),
-    };
-    this.users.push(newUser);
-    return of(newUser).pipe(delay(500));
+  addUser(user: CreateUserRequest): Observable<User> {
+    return this.http.post<User>(this.apiUrl, user);
   }
 
   // Update existing user
-  updateUser(user: User): Observable<User> {
-    const index = this.users.findIndex(u => u.id === user.id);
-    if (index !== -1) {
-      this.users[index] = user;
-    }
-    return of(user).pipe(delay(500));
+  updateUser(id: string, user: UpdateUserRequest): Observable<User> {
+    return this.http.put<User>(`${this.apiUrl}/${id}`, user);
   }
 
   // Delete user
-  deleteUser(id: number): Observable<boolean> {
-    const initialLength = this.users.length;
-    this.users = this.users.filter(u => u.id !== id);
-    return of(this.users.length !== initialLength).pipe(delay(500));
-  }
-
-  private getNextId(): number {
-    return Math.max(...this.users.map(u => u.id)) + 1;
+  deleteUser(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }

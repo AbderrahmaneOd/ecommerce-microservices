@@ -1,1 +1,52 @@
-<p>user-details works!</p>
+<mat-card class="cardWithShadow theme-card">
+    <mat-card-header>
+      <mat-card-title>{{ isNew ? 'Add New User' : 'Edit User' }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="b-t-1">
+      <form [formGroup]="userForm" (ngSubmit)="saveUser()">
+        <div class="row">
+          <div class="col-lg-6">
+            <!-- username input -->
+            <mat-label class="f-w-600 m-b-8 d-block">Username</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput placeholder="your username" formControlName="username" />
+              <mat-error *ngIf="userForm.get('username')?.errors?.['required'] && userForm.get('username')?.touched">
+                Username is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+  
+          <div class="col-lg-6">
+            <!-- email input -->
+            <mat-label class="f-w-600 m-b-8 d-block">Email</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput type="email" placeholder="your email" formControlName="email" />
+              <mat-error *ngIf="userForm.get('email')?.errors?.['required'] && userForm.get('email')?.touched">
+                Email is required
+              </mat-error>
+              <mat-error *ngIf="userForm.get('email')?.errors?.['email'] && userForm.get('email')?.touched">
+                Please enter a valid email address
+              </mat-error>
+            </mat-form-field>
+          </div>
+  
+          <div class="col-lg-6">
+            <!-- password input -->
+            <mat-label class="f-w-600 m-b-8 d-block">Password</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput type="password" placeholder="your password" formControlName="password" />
+              <mat-error *ngIf="isNew && userForm.get('password')?.errors?.['required'] && userForm.get('password')?.touched">
+                Password is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+        </div>
+  
+        <div class="m-t-12">
+          <button mat-flat-button color="primary" class="m-r-8" type="submit">Submit</button>
+          <button mat-stroked-button color="warn" type="button" (click)="cancel()">Cancel</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>

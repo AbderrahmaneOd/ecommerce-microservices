@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { UsersRoutingModule } from './users-routing.module';
 import { UserListComponent } from './pages/user-list/user-list.component';
 import { UserDetailsComponent } from './pages/user-details/user-details.component';
-import { UserFormComponent } from './components/user-form/user-form.component';
 
 @NgModule({
   declarations: [
@@ -13,8 +12,7 @@ import { UserFormComponent } from './components/user-form/user-form.component';
     CommonModule,
     UserListComponent,
     UserDetailsComponent,
-    UserFormComponent,
-    UsersRoutingModule
+    UsersRoutingModule,
   ]
 })
 export class UsersModule { }
