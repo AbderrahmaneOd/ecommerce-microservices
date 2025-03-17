@@ -7,6 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UserService {
 
@@ -35,8 +38,17 @@ public class UserService {
                 .collect(Collectors.toList());
     }*/
 
-    public Page<UserDTO> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable).map(user -> new UserDTO(user.getId(), user.getEmail(), user.getUsername()));
+    /*public List<UserDTO> getFilteredUser(String username, String email, Pageable pageable) {
+        return userRepository.findByUsernameLikeAndEmailLike(username, email, pageable).stream()
+                .map(user -> new UserDTO(user.getId(), user.getEmail(), user.getUsername()))
+                .collect(Collectors.toList());
+    }*/
+
+    public Page<UserDTO> getAllUsers(String username, String email, Pageable pageable) {
+        Page<User> users = userRepository.findByUsernameLikeAndEmailLike(username, email, pageable);
+
+        // Convert Page<User> to Page<UserDTO> while preserving pagination information
+        return users.map(user -> new UserDTO(user.getId(), user.getEmail(), user.getUsername()));
     }
 
     // Get user email by ID (for checking if the user exists)

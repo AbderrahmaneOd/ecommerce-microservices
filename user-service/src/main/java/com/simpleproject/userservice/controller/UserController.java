@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +24,10 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    public UserController(UserService userService) {
+    private final PagedResourcesAssembler<UserDTO> pagedResourcesAssembler;
+    public UserController(UserService userService, PagedResourcesAssembler<UserDTO> pagedResourcesAssembler) {
         this.userService = userService;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     // Create a new user
@@ -51,15 +56,28 @@ public class UserController {
 
     // Get paginated users
     @GetMapping
-    public ResponseEntity<Page<UserDTO>> getAllUsers(
+    public ResponseEntity<PagedModel<EntityModel<UserDTO>>> getAllUsers(
+            @RequestParam(defaultValue = "") String username,
+            @RequestParam(defaultValue = "") String email,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserDTO> users = userService.getAllUsers(pageable);
+        Page<UserDTO> users = userService.getAllUsers(username, email, pageable);
 
-        return ResponseEntity.ok(users);
+        // Convert to a stable PagedModel with HATEOAS links
+        PagedModel<EntityModel<UserDTO>> userPagedModel = pagedResourcesAssembler.toModel(users);
+
+        return ResponseEntity.ok(userPagedModel);
     }
+
+    /*@GetMapping("/filter")
+    public ResponseEntity<List<UserDTO>> getFilteredUser(
+            @RequestParam(defaultValue = "") String username,
+            @RequestParam(defaultValue = "") String email
+    ){
+        return ResponseEntity.ok(userService.getFilteredUser(username, email));
+    }*/
 
     // Count user
     @GetMapping("/count")
