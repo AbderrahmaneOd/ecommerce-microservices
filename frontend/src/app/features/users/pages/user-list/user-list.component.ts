@@ -13,6 +13,8 @@ import { Observable, of, catchError, EMPTY, BehaviorSubject } from 'rxjs';
 import { User } from '../../../../core/models/user.model';
 import { UserService } from '../../services/user.service';
 import { map, finalize } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
+
 
 export interface PagedResponse<T> {
   content: T[];
@@ -33,32 +35,39 @@ export interface PagedResponse<T> {
     MatMenuModule,
     MatButtonModule,
     RouterModule,
+    FormsModule,
   ],
   templateUrl: './user-list.component.html',
 })
 export class UserListComponent implements OnInit {
   displayedColumns: string[] = ['username', 'email', 'status', 'action'];
-  
+
   // Change to BehaviorSubject for better error handling
   private usersSubject = new BehaviorSubject<User[]>([]);
   users$ = this.usersSubject.asObservable();
-  
+
   // Pagination properties
   totalUsers = 0;
   pageSize = 5;
   currentPage = 0;
-  
+
   // Error handling
   hasError = false;
   errorMessage = 'Unable to connect to the server. Please try again later.';
   loading = false;
+
+  // Add filters object
+  filters = {
+    username: '',
+    email: ''
+  };
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private userService: UserService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUsers();
@@ -68,13 +77,13 @@ export class UserListComponent implements OnInit {
     // Reset error state
     this.hasError = false;
     this.loading = true;
-    
+
     // Fetch users using pagination parameters
-    this.userService.getUsers(this.currentPage, this.pageSize)
+    this.userService.getUsers(this.filters.username, this.filters.email, this.currentPage, this.pageSize)
       .pipe(
         map((response: PagedResponse<User>) => {
           this.totalUsers = response.totalElements;
-          return response.content;
+          return response.content; // Extract only the 'content' (the list of users)
         }),
         catchError(error => {
           console.error('Error fetching users:', error);
@@ -88,6 +97,7 @@ export class UserListComponent implements OnInit {
       .subscribe({
         next: (users) => {
           this.usersSubject.next(users);
+          // console.log('Users loaded:', users);
         },
         error: (err) => {
           // This shouldn't be reached due to catchError above, but as a safety
@@ -124,6 +134,20 @@ export class UserListComponent implements OnInit {
           this.loadUsers();
         });
     }
+  }
+
+  applyFilters() {
+    this.currentPage = 0; // Reset to first page when applying filters
+    this.loadUsers();
+  }
+
+  resetFilters() {
+    this.filters = {
+      username: '',
+      email: ''
+    };
+    this.currentPage = 0;
+    this.loadUsers();
   }
 
   retryConnection(): void {

@@ -31,6 +31,35 @@
     </ng-container>
 
     <ng-container *ngIf="!hasError && !loading">
+      <!-- Filter inputs -->
+      <div class="m-b-16">
+        <mat-form-field appearance="outline" class="m-r-16">
+          <mat-label>Username</mat-label>
+          <input matInput [(ngModel)]="filters.username" placeholder="Filter by username">
+          <button *ngIf="filters.username" matSuffix mat-icon-button aria-label="Clear" (click)="filters.username = ''">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="m-r-16">
+          <mat-label>Email</mat-label>
+          <input matInput [(ngModel)]="filters.email" placeholder="Filter by email">
+          <button *ngIf="filters.email" matSuffix mat-icon-button aria-label="Clear" (click)="filters.email = ''">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="applyFilters()">
+          <mat-icon>search</mat-icon>
+          <span>Apply Filters</span>
+        </button>
+
+        <button *ngIf="filters.username || filters.email" mat-button class="m-l-8" (click)="resetFilters()">
+          <mat-icon>clear</mat-icon>
+          <span>Reset</span>
+        </button>
+      </div>
+
       <div class="table-responsive">
         <table mat-table [dataSource]="users$" class="w-100">
           <!-- Position Column -->

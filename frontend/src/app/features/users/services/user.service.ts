@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User, CreateUserRequest, UpdateUserRequest } from '../../../core/models/user.model';
-
+import { map } from 'rxjs/operators';
 
 export interface PagedResponse<T> {
   content: T[];
@@ -22,12 +22,28 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   // Get all users with pagination
-  getUsers(pageNumber: number = 0, pageSize: number = 5): Observable<PagedResponse<User>> {
+  getUsers(username: string = '', email: string = '', pageNumber: number = 0, pageSize: number = 5): Observable<PagedResponse<User>> {
     const params = new HttpParams()
+      .set('username', username)
+      .set('email', email)
       .set('page', pageNumber.toString())
       .set('size', pageSize.toString());
 
-    return this.http.get<PagedResponse<User>>(this.apiUrl, { params });
+    //return this.http.get<PagedResponse<User>>(this.apiUrl, { params });
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map(response => this.transformHateoasResponse(response))
+    );
+  }
+
+  // Transform HATEOAS response into the expected format
+  private transformHateoasResponse(response: any): PagedResponse<User> {
+    return {
+      content: response._embedded?.userDTOes || [],  // Extract user list from _embedded
+      totalElements: response.page?.totalElements || 0,
+      totalPages: response.page?.totalPages || 0,
+      pageNumber: response.page?.number || 0,
+      pageSize: response.page?.size || 0
+    };
   }
 
   // Get the total count of users
