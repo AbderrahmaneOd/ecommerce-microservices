@@ -8,7 +8,10 @@ import com.simpleproject.productservice.model.Product;
 import com.simpleproject.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,17 +29,30 @@ public class ProductService {
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
                 .price(productRequest.getPrice())
+                .skuCode(generateSku(productRequest.getName()))
                 .build();
         productRepository.save(product);
         log.info("Product {} is saved successfully", product.getId());
     }
 
+    // SKU Generation Strategy
+    private String generateSku(String productName) {
+        String prefix = productName.replaceAll("[^A-Za-z0-9]", "").substring(0, Math.min(4, productName.length())).toUpperCase();
+        String uniqueId = UUID.randomUUID().toString().substring(0, 8).toUpperCase(); // Shortened UUID
+        return prefix + "-" + uniqueId; // Example: "LAPT-1A2B3C4D"
+    }
+
     // Get All Products
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll()
-                .stream()
-                .map(this::mapToProductResponse)
-                .collect(Collectors.toList());
+    public Page<ProductResponse> getAllProducts(String name, Pageable pageable) {
+        Page<Product> products = productRepository.findByNameLike(name, pageable);
+
+        return products.map(product -> new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getSkuCode()
+                ));
     }
 
     // Get Product By ID

@@ -12,10 +12,7 @@ import org.springframework.data.annotation.Id;
 @Builder
 public class ProductRequest {
 
-    @Id
-    private String id;
     private String name;
     private String description;
     private double price;
-    private String skuCode;
 }
