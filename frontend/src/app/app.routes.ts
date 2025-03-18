@@ -18,6 +18,11 @@ export const routes: Routes = [
           import('./features/users/users.module').then((m) => m.UsersModule),
       },
       {
+        path: 'products',
+        loadChildren: () =>
+          import('./features/products/products.module').then((m) => m.ProductsModule),
+      },
+      {
         path: 'ui-components',
         loadChildren: () =>
           import('./pages/ui-components/ui-components.routes').then(

@@ -16,6 +16,12 @@ export const navItems: NavItem[] = [
     route: '/users',
     bgcolor: 'success',
   },
+  {
+    displayName: 'Products',
+    iconName: 'table',
+    route: '/products',
+    bgcolor: 'success',
+  },
   // {
   //   displayName: 'Dashboard 1',
   //   iconName: 'layout-dashboard',

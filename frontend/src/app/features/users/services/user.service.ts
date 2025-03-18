@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User, CreateUserRequest, UpdateUserRequest } from '../../../core/models/user.model';
 import { map } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 export interface PagedResponse<T> {
   content: T[];
@@ -17,7 +18,8 @@ export interface PagedResponse<T> {
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8085/api/users';
+  // private apiUrl = 'http://localhost:8085/api/users';
+  private apiUrl = environment.userApiUrl;
 
   constructor(private http: HttpClient) { }
 

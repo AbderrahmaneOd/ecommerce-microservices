@@ -1,0 +1,67 @@
+<mat-card class="cardWithShadow theme-card">
+  <mat-card-header>
+    <mat-card-title>{{ isNew ? 'Add New Product' : 'Edit Product' }}</mat-card-title>
+  </mat-card-header>
+  <mat-card-content class="b-t-1">
+    <form [formGroup]="productForm" (ngSubmit)="saveProduct()">
+      <div class="row">
+
+        <div *ngIf="!isNew" class="col-lg-6">
+          <!-- skucode input -->
+          <mat-label class="f-w-600 m-b-8 d-block">SKU Code</mat-label>
+          <mat-form-field appearance="outline" class="w-100" color="primary">
+            <input matInput type="text" placeholder="SKU code" formControlName="sku" [readonly]="true" />
+          </mat-form-field>
+        </div>
+
+        <div class="col-lg-6">
+          <!-- product name input -->
+          <mat-label class="f-w-600 m-b-8 d-block">Name</mat-label>
+          <mat-form-field appearance="outline" class="w-100" color="primary">
+            <input matInput placeholder="product name" formControlName="name" />
+            <mat-error *ngIf="productForm.get('name')?.errors?.['required'] && productForm.get('name')?.touched">
+              Name is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-lg-6">
+          <!-- price input -->
+          <mat-label class="f-w-600 m-b-8 d-block">Price</mat-label>
+          <mat-form-field appearance="outline" class="w-100" color="primary">
+            <input matInput type="number" placeholder="product price" formControlName="price" />
+            <mat-error
+              *ngIf="isNew && productForm.get('price')?.errors?.['required'] && productForm.get('price')?.touched">
+              Price is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-lg-6">
+          <!-- description input -->
+          <mat-label class="f-w-600 m-b-8 d-block">Description</mat-label>
+          <mat-form-field appearance="outline" class="w-100" color="primary">
+            <textarea matInput type="textarea" placeholder="product description"
+              formControlName="description">  </textarea>
+            <mat-error
+              *ngIf="productForm.get('description')?.errors?.['required'] && productForm.get('description')?.touched">
+              Desciption is required
+            </mat-error>
+            <mat-error
+              *ngIf="productForm.get('description')?.errors?.['description'] && productForm.get('description')?.touched">
+              Please enter a valid description
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+
+
+      </div>
+
+      <div class="m-t-12">
+        <button mat-flat-button color="primary" class="m-r-8" type="submit">Submit</button>
+        <button mat-stroked-button color="warn" type="button" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
