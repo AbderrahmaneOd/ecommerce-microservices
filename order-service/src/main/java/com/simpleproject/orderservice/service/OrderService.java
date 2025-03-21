@@ -37,7 +37,7 @@ public class OrderService {
     public void placeOrder(CreateOrderRequest orderRequest) {
 
         // Check user
-        String email = userService.checkUserExistence(orderRequest.getUserId());
+        String email = userService.getUserEmailById(orderRequest.getUserId());
         if (email == null || email.isEmpty()){
             throw new IllegalStateException("User " + orderRequest.getUserId() + " is not found");
         }

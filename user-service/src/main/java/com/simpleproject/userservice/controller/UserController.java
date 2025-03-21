@@ -91,13 +91,22 @@ public class UserController {
     }
 
     // Check if user exists by ID and return their email
-    @GetMapping("/exists/{id}")
-    public ResponseEntity<String> checkUserExists(@PathVariable String id) {
+    @GetMapping("/{id}/email")
+    public ResponseEntity<String> getUserEmailById(@PathVariable String id) {
         String email = userService.getUserEmailById(id);
         if (email != null) {
             return ResponseEntity.ok(email);
         }
         return ResponseEntity.notFound().build();
+    }
+
+    // Check if user exists by ID and return boolean
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> doesUserExist(@PathVariable String id) {
+        boolean exists = userService.doesUserExist(id);
+        if(exists)
+            return ResponseEntity.ok(true);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
     }
 
     // Update user

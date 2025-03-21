@@ -79,4 +79,8 @@ public class UserService {
     public long getUserCount() {
         return userRepository.count();
     }
+
+    public boolean doesUserExist(String id) {
+        return userRepository.existsById(id);
+    }
 }

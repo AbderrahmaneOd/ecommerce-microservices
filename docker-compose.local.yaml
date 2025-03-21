@@ -42,6 +42,24 @@ services:
       - POSTGRES_USER=inventory-service
       - POSTGRES_DB=InventoryDB
 
+
+  # Redis for cart service
+  redis_cart:
+    image: redis:7.2.7
+    container_name: redis-cart
+    # restart: always
+    ports:
+    - "6379:6379"
+    command: [ "redis-server", "--appendonly", "yes" ]
+    # volumes:
+    #   - redis_data:/data
+
+  redis_insight:
+    image: redislabs/redisinsight:2.66
+    container_name: redisinsight
+    restart: always
+    ports:
+    - '5540:5540'
       
   zookeeper:
     image: bitnami/zookeeper:3.9.3

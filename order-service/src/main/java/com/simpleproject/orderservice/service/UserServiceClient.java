@@ -27,17 +27,16 @@ public class UserServiceClient {
     @Retry(name = "userServiceRetry", fallbackMethod = "fallbackCheckUserExistence")
     @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "fallbackCheckUserExistence")
     //@TimeLimiter(name = "userServiceTimeLimiter", fallbackMethod = "fallbackCheckUserExistence")
-    public String checkUserExistence(String userId) {
+    public String getUserEmailById(String userId) {
 
         try{
-
             // Call inventory service
             return webClientBuilder
                     .baseUrl(userServiceUrl) // Set the base URL here
                     .build()
                     .get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/api/users/exists/{userId}")
+                            .path("/api/users/{userId}/email")
                             .build(userId))
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, response -> {
@@ -57,7 +56,7 @@ public class UserServiceClient {
     }
 
     // Fallback method in case of failures
-    public String fallbackCheckUserExistence(String userId, Throwable t) {
+    public String fallbackGetUserEmailById(String userId, Throwable t) {
         log.error("Failed to check user {}: {}", userId, t.getMessage());
         return "User service is unavailable at the moment, please try again later.";
     }
