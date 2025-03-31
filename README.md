@@ -4,12 +4,9 @@ A modern, distributed e-commerce application built with **Spring Boot microservi
 
 ---
 
-
 ## Architecture Overview
 
 The platform is designed as a collection of loosely coupled microservices, each responsible for a specific business capability. The architecture includes:
-
-
 
 - **API Gateway**: Single entry point for all client requests, handles routing and load balancing
 - **Config Server**: Centralized configuration management for all services
@@ -18,6 +15,7 @@ The platform is designed as a collection of loosely coupled microservices, each 
 - **Inventory Service**: Handles stock management and availability (PostgreSQL)
 - **Order Service**: Processes customer orders with circuit breaker patterns (PostgreSQL)
 - **User Service**: Manages user accounts and authentication (MongoDB)
+- **Cart Service:** Manages shopping cart (Redis)
 - **Notification Service**: Sends order confirmations and updates to customers via email
 
 ## Project Structure
@@ -32,6 +30,7 @@ microservices-ecommerce/
 ├── order-service/
 ├── product-service/
 ├── user-service/
+├── cart-service/
 ├── docker-compose.dev.yaml
 ├── docker-compose.local.yaml
 └── README.md
@@ -58,7 +57,6 @@ The project demonstrates different communication styles between services:
 - **Synchronous Communication**: Order Service → Inventory Service using WebClient
 - **Asynchronous Communication**: Order Service → Notification Service using Kafka
 - **Resilience Patterns**: Circuit breaker implementation in Order Service for fault tolerance
-
 
 ## Getting Started
 
@@ -144,18 +142,18 @@ This allows you to run individual services from your IDE with the local profile 
 
 ### Services and Ports
 
-| Service              | Port | API endpoint        | Database                | Description                        |
-| -------------------- | ---- | ------------------- | ----------------------- | ---------------------------------- |
-| Config Server        | 8888 | N/A                 | N/A                     | Centralized configuration          |
-| Discovery Server     | 8761 | N/A                 | N/A                     | Service registration and discovery |
-| API Gateway          | 8080 | N/A                 | N/A                     | Entry point for client requests    |
-| Product Service      | 8081 | /api/products       | MongoDB (27017)         | Product catalog management         |
-| Order Service        | 8082 | /api/orders         | PostgreSQL (5431)       | Order processing                   |
-| Inventory Service    | 8083 | /api/inventories    | PostgreSQL (5432)       | Stock management                   |
-| Notification Service | 8084 | N/A                 | N/A                     | Customer email notifications       |
-| User Service         | 8085 | /api/users          | MongoDB (27018)         | User management                    |
-| Kafka UI             | 8090 | N/A                 | N/A                     | Kafka management UI                |
-
+| Service              | Port | API endpoint     | Database          | Description                        |
+| -------------------- | ---- | ---------------- | ----------------- | ---------------------------------- |
+| Config Server        | 8888 | N/A              | N/A               | Centralized configuration          |
+| Discovery Server     | 8761 | N/A              | N/A               | Service registration and discovery |
+| API Gateway          | 8080 | N/A              | N/A               | Entry point for client requests    |
+| Product Service      | 8081 | /api/products    | MongoDB (27017)   | Product catalog management         |
+| Order Service        | 8082 | /api/orders      | PostgreSQL (5431) | Order processing                   |
+| Inventory Service    | 8083 | /api/inventories | PostgreSQL (5432) | Stock management                   |
+| Notification Service | 8084 | N/A              | N/A               | Customer email notifications       |
+| User Service         | 8085 | /api/users       | MongoDB (27018)   | User management                    |
+| Cart Service         | 8086 | /api/cart        | Redis             | Shopping cart management           |
+| Kafka UI             | 8090 | N/A              | N/A               | Kafka management UI                |
 
 ## Contributing
 
