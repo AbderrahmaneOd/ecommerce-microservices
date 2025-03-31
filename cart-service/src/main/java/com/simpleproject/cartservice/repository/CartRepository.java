@@ -1,5 +1,6 @@
 package com.simpleproject.cartservice.repository;
 
+import com.simpleproject.cartservice.dto.AddToCartRequest;
 import com.simpleproject.cartservice.model.CartItem;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -16,7 +17,7 @@ public class CartRepository {
 
     private static final String CART_PREFIX = "cart:";
 
-    public void addToCart(String userId, CartItem item) {
+    public void addToCart(String userId, AddToCartRequest item) {
         String key = CART_PREFIX + userId;
         redisTemplate.opsForList().rightPush(key, item);
         System.out.println("Item added to cart: " + item);

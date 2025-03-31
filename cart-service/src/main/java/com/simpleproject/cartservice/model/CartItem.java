@@ -14,13 +14,8 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonSerialize
-@JsonDeserialize
-public class CartItem implements Serializable {
+public class CartItem {
 
-    @JsonProperty("productId")
     private String productId;
-
-    @JsonProperty("quantity")
     private int quantity;
 }

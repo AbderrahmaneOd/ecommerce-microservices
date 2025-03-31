@@ -1,7 +1,9 @@
 package com.simpleproject.cartservice.controller;
 
+import com.simpleproject.cartservice.dto.AddToCartRequest;
 import com.simpleproject.cartservice.model.CartItem;
 import com.simpleproject.cartservice.service.CartService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,24 +20,29 @@ public class CartController {
         this.cartService = cartService;
     }
 
+
     /*@PostMapping("/{userId}/add")
-    public void addToCart(@PathVariable String userId, @RequestBody CartItem item) {
-        cartService.addToCart(userId, item);
+    public ResponseEntity<?> addItemToCart(@PathVariable String userId, @RequestBody CartItem item) {
+        boolean isAdded = cartService.addItemToCart(userId, item);
+
+        if (isAdded) {
+            return ResponseEntity.ok(
+                    Map.of("message", "Item successfully added to cart", "userId", userId)
+            );
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("error", "User not found. Please register.")
+            );
+        }
     }*/
 
     @PostMapping("/{userId}/add")
-    public ResponseEntity<Map<String, String>> addToCart(@PathVariable String userId, @RequestBody CartItem item) {
-        String effectiveUserId = userId;
+    public ResponseEntity<String> addItemToCart(
+            @PathVariable String userId,
+            @RequestBody AddToCartRequest request) {
 
-        if (userId.equalsIgnoreCase("guest")) {
-            effectiveUserId = "guest-" + UUID.randomUUID();
-        } else if (!cartService.checkIfUserExists(userId)) {
-            return ResponseEntity.badRequest().body(Map.of("error", "User not found. Please register."));
-        }
-
-        cartService.addToCart(effectiveUserId, item);
-
-        return ResponseEntity.ok(Map.of("message", "Item added to cart", "userId", effectiveUserId));
+        cartService.addItemToCart(userId, request);
+        return ResponseEntity.ok("Item added to cart successfully");
     }
 
     @GetMapping("/{userId}")
