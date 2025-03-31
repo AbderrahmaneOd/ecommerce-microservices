@@ -21,21 +21,36 @@ public class DBInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         List<Inventory> inventoryList = new ArrayList<>();
 
-        inventoryList.add(new Inventory(null, "SKU12345", 250));
-        inventoryList.add(new Inventory(null, "SKU12346", 120));
-        inventoryList.add(new Inventory(null, "SKU12347", 50));
-        inventoryList.add(new Inventory(null, "SKU12348", 200));
-        inventoryList.add(new Inventory(null, "SKU12349", 300));
-        inventoryList.add(new Inventory(null, "SKU12350", 75));
-        inventoryList.add(new Inventory(null, "SKU12351", 450));
-        inventoryList.add(new Inventory(null, "SKU12352", 80));
-        inventoryList.add(new Inventory(null, "SKU12353", 600));
-        inventoryList.add(new Inventory(null, "SKU12354", 150));
-        inventoryList.add(new Inventory(null, "SKU12355", 500));
-        inventoryList.add(new Inventory(null, "SKU12356", 30));
-        inventoryList.add(new Inventory(null, "SKU12357", 20));
-        inventoryList.add(new Inventory(null, "SKU12358", 100));
-        inventoryList.add(new Inventory(null, "SKU12359", 10));
+        inventoryList.add(new Inventory(null, "SKU20001", 250));
+        inventoryList.add(new Inventory(null, "SKU20002", 120));
+        inventoryList.add(new Inventory(null, "SKU20003", 0));
+        inventoryList.add(new Inventory(null, "SKU20004", 12));
+        inventoryList.add(new Inventory(null, "SKU20005", 0));
+        inventoryList.add(new Inventory(null, "SKU20006", 75));
+        inventoryList.add(new Inventory(null, "SKU20007", 0));
+        inventoryList.add(new Inventory(null, "SKU20008", 80));
+        inventoryList.add(new Inventory(null, "SKU20009", 7));
+        inventoryList.add(new Inventory(null, "SKU20010", 48));
+        inventoryList.add(new Inventory(null, "SKU20011", 90));
+        inventoryList.add(new Inventory(null, "SKU20012", 30));
+        inventoryList.add(new Inventory(null, "SKU20013", 20));
+        inventoryList.add(new Inventory(null, "SKU20014", 4));
+        inventoryList.add(new Inventory(null, "SKU20015", 10));
+        inventoryList.add(new Inventory(null, "SKU20016", 6));
+        inventoryList.add(new Inventory(null, "SKU20017", 88));
+        inventoryList.add(new Inventory(null, "SKU20018", 0));
+        inventoryList.add(new Inventory(null, "SKU20019", 30));
+        inventoryList.add(new Inventory(null, "SKU20020", 20));
+        inventoryList.add(new Inventory(null, "SKU20021", 0));
+        inventoryList.add(new Inventory(null, "SKU20022", 10));
+        inventoryList.add(new Inventory(null, "SKU20023", 20));
+        inventoryList.add(new Inventory(null, "SKU20024", 3));
+        inventoryList.add(new Inventory(null, "SKU20025", 1));
+        inventoryList.add(new Inventory(null, "SKU20026", 20));
+        inventoryList.add(new Inventory(null, "SKU20027", 7));
+        inventoryList.add(new Inventory(null, "SKU20028", 10));
+        inventoryList.add(new Inventory(null, "SKU20029", 0));
+        inventoryList.add(new Inventory(null, "SKU20030", 2));
 
         inventoryRepository.saveAll(inventoryList);
 
