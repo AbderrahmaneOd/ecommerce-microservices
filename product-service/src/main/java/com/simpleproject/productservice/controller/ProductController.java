@@ -27,7 +27,6 @@ public class ProductController {
     private final ProductService productService;
     private final PagedResourcesAssembler<ProductResponse> pagedResourcesAssembler;
 
-
     // Create Product
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -55,6 +54,12 @@ public class ProductController {
     @GetMapping("/{id}")
     public ProductResponse getProductById(@PathVariable String id) {
         return this.productService.getProductById(id);
+    }
+
+    // Read a Single Product by ID
+    @GetMapping("/sku/{skuCode}")
+    public ProductResponse getProductBySkuCode(@PathVariable String skuCode) {
+        return this.productService.getProductBySkuCode(skuCode);
     }
 
     // Update Product

@@ -92,6 +92,12 @@ public class ProductService {
                 .skuCode(product.getSkuCode())
                 .build();
     }
+
+    public ProductResponse getProductBySkuCode(String skuCode) {
+        Product product = productRepository.findBySkuCode(skuCode)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + skuCode));
+        return mapToProductResponse(product);
+    }
 }
 
 
