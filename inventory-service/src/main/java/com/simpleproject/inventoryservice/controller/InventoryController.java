@@ -16,12 +16,12 @@ public class InventoryController {
 
     private final InventoryService inventoryService;
 
-
-    @GetMapping("/{skuCode}/availability")
+    @GetMapping("/{skuCode}/stock-availability")
     @ResponseStatus(HttpStatus.OK)
-    public Boolean isInStock(@PathVariable String skuCode, @RequestParam int quantity) {
+    public Boolean isStockAvailable(@PathVariable String skuCode, @RequestParam int quantity) {
         return inventoryService.isInStock(skuCode, quantity);
     }
+
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)

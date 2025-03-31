@@ -35,12 +35,12 @@ public class InventoryServiceClient {
                 .build()
                 .get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/api/inventories/{skuCode}/availability") // skuCode as a path variable
+                        .path("/api/inventories/{skuCode}/stock-availability") // skuCode as a path variable
                         .queryParam("quantity", quantity) // quantity as a query parameter
                         .build(skuCode)) // Set skuCode value in the URI
                 .retrieve()
                 .bodyToMono(Boolean.class) // Expecting a Boolean response
-                .block(); // Blocking
+                .block(); // Blocking (Sync)
 
         log.info("Inventory check for SKU {}: {}", skuCode, isInStock);
         return isInStock != null && isInStock;
